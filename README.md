@@ -1,4 +1,3 @@
-# Trabalho Prático Final de Programação Modular:
+# Trabalho Prático Final de Programação Modular
 
-Jogo do Adler, utilizando os conceitos de Programação Orientada a Objetos em Java e Interface Gráfica.
-
+# Jogo do Adler usando a linguagem Java e interface gráfica
