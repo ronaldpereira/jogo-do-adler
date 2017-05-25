@@ -6,33 +6,52 @@
 package com.mygdx.game;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.Texture; 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 /**
  *
  * @author Hiago
  */
-public class Tile {
-    Texture sprite;
-    Rectangle position;
-    Boolean blocksMovement;
+public class Tile extends CollidableObject{
+    private Texture sprite;
+    protected Boolean checksCollision;
+    private Boolean blocksMovement;
+    private float attrition = 17.5f;
+    private float maxSpeed = 8f;
     
     public Tile(int x,int y)
     {
         //sprite = new Texture();
-        position = new Rectangle();
-        position.x = x;
-        position.y = y;
+        boundingBox = new BoundingBox(x,y,32,32);
+        checksCollision = false;
         blocksMovement = false;
     }
     
     public Tile(int x,int y,Texture spr,Boolean blocks)
     {
         sprite = spr;
-        position = new Rectangle();
-        position.x = x;
-        position.y = y;
+        boundingBox = new BoundingBox(x,y,32,32);
+        checksCollision = blocks;
         blocksMovement = blocks;
     }
+    public void setAttrition(float value)
+    {
+        attrition = value;
+    }
     
+    public float getAttrition()
+    {
+        return attrition;
+    }
+    
+    public void setMaxSpeed(float value)
+    {
+        maxSpeed = value;
+    }
+    
+    public float getMaxSpeed()
+    {
+        return maxSpeed;
+    }
     public void setSprite(Texture spr)
     {
         sprite = spr;
@@ -45,6 +64,10 @@ public class Tile {
     
     public void setBlock(Boolean blocks)
     {
+        if(blocks == true)
+        {
+            checksCollision = true;
+        }
         blocksMovement = blocks;
     }
     
@@ -52,4 +75,34 @@ public class Tile {
     {
         return blocksMovement;
     }
+    
+    public Boolean getCollides()
+    {
+        return checksCollision;
+    }
+    
+    public void setCollides(Boolean checks)
+    {
+        checksCollision = checks;
+    }
+    
+    public void drawSelf(SpriteBatch batch)
+    {
+        if(sprite != null)
+        {
+            batch.draw(sprite,boundingBox.x,boundingBox.y);
+        }
+    }
+    
+    public BoundingBox getPos()
+    {
+        return boundingBox;
+    }
+    
+    @Override
+    public void collide(ICollidable obj,CollisionInfo info)
+    {   
+        obj.handleCollision(this,info);
+    }
+    
 }

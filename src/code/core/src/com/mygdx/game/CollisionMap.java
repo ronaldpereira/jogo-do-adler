@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import static com.mygdx.game.Axis.*;
+import static java.lang.Math.ceil;
 
 /**
  *
@@ -17,6 +19,8 @@ import com.badlogic.gdx.math.Vector2;
 public class CollisionMap 
 {
     private static final Texture BLOCK = new Texture("BlackBlock.png");
+    private static final Texture ICE = new Texture("ice.png");
+    private static final Texture COIN = new Texture("Chinelo.png");
     private Tile[][] map;
     private SpriteBatch drawArea;
     
@@ -46,61 +50,142 @@ public class CollisionMap
         map[x][y].setSprite(BLOCK);
     }
     
+    public void createIce(int x,int y)
+    {
+        map[x][y].setBlock(true);
+        map[x][y].setSprite(ICE);
+        map[x][y].setAttrition(2f);
+        map[x][y].setMaxSpeed(15f);
+    }
+    
+    public void createCoin(int x,int y)
+    {
+        map[x][y] = new Coin(x * tileSize,y * tileSize,COIN);
+    }
+    
     public void renderMap()
     {
         for(int i = 0;i < width;i++)
         {
             for(int j =0;j < height;j++)
             {
-                if(map[i][j].getSprite() != null)
-                {
-                    drawArea.draw(map[i][j].getSprite(),i * tileSize,j * tileSize);
-                }
+                map[i][j].drawSelf(drawArea);
             }
         }
     }
     
-    public Vector2 getTile(int x,int y)
+    public Vector2 getTile(float x,float y)
     {
-        return new Vector2((int)x/tileSize,(int)y/tileSize);
+        return new Vector2((int)(x/tileSize),(int)(y/tileSize));
     }
     
-    public Vector2 getHorizontalIntersection(Rectangle boundingBox)
+    public Vector2 getHorizontalIntersection(BoundingBox boundingBox)
     {
-        int min = (int)(getTile((int)boundingBox.x,(int)boundingBox.y).x);
-        int max = (int)(getTile((int)(boundingBox.x + boundingBox.width),(int)boundingBox.y).x);
-        
+        int min = (int)(getTile(boundingBox.x,boundingBox.y).x);
+        int max = (int)(getTile((boundingBox.x + boundingBox.width),boundingBox.y).x);
+       // System.out.println("HORIZONTAL: " + min + " - " + max);
         return new Vector2(min,max);
     }
     
     public Vector2 getVerticalIntersection(Rectangle boundingBox)
     {
-        int min = (int)(getTile((int)boundingBox.x,(int)boundingBox.y).y);
-        int max = (int)(getTile((int)boundingBox.x,(int)(boundingBox.y + boundingBox.height)).y);
+        int min = (int)(getTile(boundingBox.x,boundingBox.y).y);
+        int max = (int)(getTile(boundingBox.x,(boundingBox.y + boundingBox.height)).y);
+        //System.out.println("VERTICAL: " + min + " - " + max)F;
         
         return new Vector2(min,max);
     }
     
-    public float getHorizontalDistance(Rectangle boundingBox,int direction)
+    public void closestHorizontalCollision(CollidableObject entity,int direction,float distance)
     {
-        Boolean collision = false;
-        int delta = 0;
-        float distance;
-        Vector2 intersection = getVerticalIntersection(boundingBox);
-        
-        while(!collision)
+        if(direction == 0)
         {
-            delta++;
-            for(int i = (int)intersection.x;i <(int)intersection.y;i++)
+            return;
+        }
+        
+        int xPos;
+        BoundingBox box = entity.boundingBox;
+        int delta = 0;
+        Vector2 intersection = getVerticalIntersection(box);
+        
+        if(direction > 0)
+        {
+            xPos = (int)(getTile((int)box.getRight(),(int)box.y).x);
+        }
+        else
+        {
+            xPos = (int)(getTile((int)box.getLeft(),(int)box.y).x);
+        }
+        
+        while(xPos >= 0 && xPos < width)
+        {
+
+            for(int i = (int)intersection.x; i <= (int)intersection.y; i++)
             {
-                if(map[(int)(getTile((int)boundingBox.x,(int)boundingBox.y).x + delta * direction)][i].getBlocks())
+                if(map[xPos][i].getCollides())
                 {
-                    collision = true;
-                    distance = 
-                    break;
+                    entity.collide(map[xPos][i],new CollisionInfo(entity,HORIZONTAL_AXIS));
+                    map[xPos][i].collide(entity,new CollisionInfo(map[xPos][i],HORIZONTAL_AXIS));
+                    
+                    if(map[xPos][i].getBlocks())
+                    {
+                        return;
+                    }
                 }
             }
+
+            delta += 1;  
+            xPos += (delta * direction);
+            if(delta > (int)ceil(distance/tileSize))
+            {
+                break;
+            }
         }
-        return 0f;
+    }
+    
+    public void closestVerticalCollision(CollidableObject entity,int direction,float distance)
+    {
+        if(direction == 0)
+        {
+            return;
+        }
+        
+        BoundingBox box = entity.boundingBox;
+        int delta = 0;
+        int yPos;
+        Vector2 intersection = getHorizontalIntersection(box);
+        
+        if(direction > 0)
+        {
+            yPos = (int)(getTile((int)box.x,(int)box.getUp()).y);
+        }
+        else
+        {
+            yPos = (int)(getTile((int)box.x,(int)box.getDown()).y);
+        }
+        
+        while(yPos >= 0 && yPos < height)
+        {
+            for(int i = (int)intersection.x; i <= (int)intersection.y; i++)
+            {
+                if(map[i][yPos].getCollides())
+                {
+                    entity.collide(map[i][yPos],new CollisionInfo(entity,VERTICAL_AXIS));
+                    map[i][yPos].collide(entity,new CollisionInfo(entity,VERTICAL_AXIS));
+                    
+                    if(map[i][yPos].getBlocks())
+                    {
+                        return;
+                    }
+                }       
+            }    
+
+            delta += 1;
+            yPos += (delta * direction);
+            if(delta > (int)ceil(distance/tileSize))
+            {
+                break;
+            }
+        }
     }
 }
