@@ -19,7 +19,6 @@ public class Quadtree
     //limite de cobjetos que o no pode guardar
     private int MAX_OBJECTS = 10;
     //acho q eh descartavel hein
-    private int MAX_LEVELS = 5;
    
     private int level;
     private ArrayList<DynamicCollider> objects;
@@ -123,7 +122,7 @@ public class Quadtree
  
         objects.add(thing);
  
-        if (objects.size() > MAX_OBJECTS && level < MAX_LEVELS) 
+        if (objects.size() > MAX_OBJECTS) 
         {
             if (nodes[0] == null) split(); 
  
@@ -171,7 +170,7 @@ public class Quadtree
     ArrayList<DynamicCollider> possibleCollisions = new ArrayList<DynamicCollider>();
 
     //fazer isso em todo frame
-    quad.clear();
+    tree.clear();
     for(int i = 0; i < allObjects.size(); i++)
     {
         tree.insert(allObjects.get(i));
