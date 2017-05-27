@@ -1,1 +1,3 @@
 *.class
+/src/code/.nb-gradle/
+/src/code/desktop/build/
