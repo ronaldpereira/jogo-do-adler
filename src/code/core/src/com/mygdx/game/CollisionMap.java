@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import static com.mygdx.game.Axis.*;
 import static java.lang.Math.ceil;
+import static java.lang.Math.floor;
+import java.util.ArrayList;
 
 /**
  *
@@ -21,12 +23,14 @@ public class CollisionMap
     private static final Texture BLOCK = new Texture("BlackBlock.png");
     private static final Texture ICE = new Texture("ice.png");
     private static final Texture COIN = new Texture("Chinelo.png");
-    private Tile[][] map;
+    public Tile[][] map;
     private SpriteBatch drawArea;
     
     private int tileSize = 32;
     private int width;
     private int height;
+    private Quadtree movingObjects;
+    private ArrayList<DynamicCollider> localObjs;
     
     public CollisionMap(int width,int height,SpriteBatch batch)
     {
@@ -35,6 +39,9 @@ public class CollisionMap
         this.height = height;
         map = new Tile[width][height];
         
+        //QUADTREE
+        movingObjects = new Quadtree(0,new Rectangle(0,0,width * tileSize,height * tileSize)); 
+        
         for(int i = 0;i < width;i++)
         {
             for(int j = 0;j < height;j++)
@@ -42,6 +49,10 @@ public class CollisionMap
                 map[i][j] = new Tile(i * tileSize,j * tileSize);
             }
         }
+    }
+    public void addMovingObject(DynamicCollider obj)
+    {
+        movingObjects.insert(obj);
     }
     
     public void createBlock(int x,int y)
@@ -74,47 +85,66 @@ public class CollisionMap
         }
     }
     
-    public Vector2 getTile(float x,float y)
+    public Vector2 findTile(float x,float y)
+    {       
+        return new Vector2((int)x/tileSize,(int)y/tileSize);
+    }
+    
+    public Tile getTile(int x,int y)
     {
-        return new Vector2((int)(x/tileSize),(int)(y/tileSize));
+        return map[x][y];
     }
     
     public Vector2 getHorizontalIntersection(BoundingBox boundingBox)
     {
-        int min = (int)(getTile(boundingBox.x,boundingBox.y).x);
-        int max = (int)(getTile((boundingBox.x + boundingBox.width),boundingBox.y).x);
+        int min = (int)(findTile(boundingBox.x,boundingBox.y).x);
+        int max = (int)(findTile((boundingBox.x + boundingBox.width),boundingBox.y).x);
        // System.out.println("HORIZONTAL: " + min + " - " + max);
         return new Vector2(min,max);
     }
     
     public Vector2 getVerticalIntersection(Rectangle boundingBox)
     {
-        int min = (int)(getTile(boundingBox.x,boundingBox.y).y);
-        int max = (int)(getTile(boundingBox.x,(boundingBox.y + boundingBox.height)).y);
+        int min = (int)(findTile(boundingBox.x,boundingBox.y).y);
+        int max = (int)(findTile(boundingBox.x,(boundingBox.y + boundingBox.height)).y);
         //System.out.println("VERTICAL: " + min + " - " + max)F;
         
         return new Vector2(min,max);
     }
     
-    public void closestHorizontalCollision(CollidableObject entity,int direction,float distance)
+    public void closestHorizontalCollision(DynamicCollider entity,int direction,float distance)
     {
+        
         if(direction == 0)
         {
             return;
         }
+        //movingObjects.clear();
+        localObjs = movingObjects.getNearby(entity);
         
+        for(DynamicCollider obj : localObjs)
+        {
+            //System.out.println(localObjs.size());
+            if(entity.boundingBox.overlaps(obj.boundingBox) && entity != obj)
+            {
+                System.out.println("eu entro aqui");
+                entity.collide(obj,new CollisionInfo(entity,HORIZONTAL_AXIS));
+                obj.collide(entity,new CollisionInfo(obj,HORIZONTAL_AXIS));
+            }
+        }
         int xPos;
         BoundingBox box = entity.boundingBox;
         int delta = 0;
         Vector2 intersection = getVerticalIntersection(box);
+        //System.out.println("Inter :" + intersection.toString());
         
         if(direction > 0)
         {
-            xPos = (int)(getTile((int)box.getRight(),(int)box.y).x);
+            xPos = (int)(findTile((int)box.getRight(),(int)box.y).x);
         }
         else
         {
-            xPos = (int)(getTile((int)box.getLeft(),(int)box.y).x);
+            xPos = (int)(findTile((int)box.getLeft(),(int)box.y).x);
         }
         
         while(xPos >= 0 && xPos < width)
@@ -143,7 +173,7 @@ public class CollisionMap
         }
     }
     
-    public void closestVerticalCollision(CollidableObject entity,int direction,float distance)
+    public void closestVerticalCollision(DynamicCollider entity,int direction,float distance)
     {
         if(direction == 0)
         {
@@ -157,11 +187,11 @@ public class CollisionMap
         
         if(direction > 0)
         {
-            yPos = (int)(getTile((int)box.x,(int)box.getUp()).y);
+            yPos = (int)(findTile((int)box.x,(int)box.getUp()).y);
         }
         else
         {
-            yPos = (int)(getTile((int)box.x,(int)box.getDown()).y);
+            yPos = (int)(findTile((int)box.x,(int)box.getDown()).y);
         }
         
         while(yPos >= 0 && yPos < height)

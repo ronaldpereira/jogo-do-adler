@@ -142,7 +142,13 @@ public class Quadtree
         }
     }
     //thing eh o objeto que vc quer ver se colide com alguem
-    public ArrayList retrieve(ArrayList<DynamicCollider> returnObjects, DynamicCollider thing)
+    public  ArrayList getNearby(DynamicCollider entity)
+    {
+        ArrayList<DynamicCollider> returnObjects = new ArrayList<DynamicCollider>();
+        retrieve(returnObjects,entity);
+        return returnObjects;
+    }
+    private ArrayList retrieve(ArrayList<DynamicCollider> returnObjects, DynamicCollider thing)
     {
         if (nodes[0] != null)
         {

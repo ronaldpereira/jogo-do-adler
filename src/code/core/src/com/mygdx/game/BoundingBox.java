@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Rectangle;
  * @author Hiago
  */
 public class BoundingBox extends Rectangle{
-    
+    //TODO:ADICIONAR SKIN
     public BoundingBox(float x,float y,float width,float height)
     {
        super();

@@ -39,8 +39,8 @@ public abstract class Pickup extends Tile
         obj.handleCollision(this,info);
     }
     
-    @Override
-    public void handleCollision(DynamicCollider player,CollisionInfo info)
+    //@Override
+    public void handleCollision(ControllableCharacter player,CollisionInfo info)
     {
         if(active)
         {

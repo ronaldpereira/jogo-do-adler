@@ -24,6 +24,7 @@ public class ControllableCharacter extends DynamicCollider
     
     public ControllableCharacter(Vector2 initialPos, Texture sprite) {
         super(initialPos, sprite);
+        //TROCAR POR SKIIIIN
         boundingBox.width -=1f;
         boundingBox.height -=1f;
     }

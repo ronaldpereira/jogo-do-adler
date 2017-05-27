@@ -15,4 +15,5 @@ public interface ICollidable
     public void handleCollision(Tile tile,CollisionInfo info);
     public void handleCollision(DynamicCollider character,CollisionInfo info);
     public void collide(ICollidable obj,CollisionInfo info);
+    public void handleCollision(ControllableCharacter player,CollisionInfo info);
 }

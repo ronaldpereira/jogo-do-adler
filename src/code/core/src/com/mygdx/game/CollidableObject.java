@@ -20,7 +20,13 @@ public abstract class CollidableObject implements ICollidable
     public void handleCollision(Tile tile,CollisionInfo info){}      
     
     @Override
-    public void handleCollision(DynamicCollider character,CollisionInfo info){}        
+    public void handleCollision(DynamicCollider character,CollisionInfo info){}
+    
+    @Override
+    public void handleCollision(ControllableCharacter player,CollisionInfo info)
+    {
+        handleCollision((DynamicCollider)player,info);
+    }
 
     @Override    
     public void collide(ICollidable obj,CollisionInfo info)

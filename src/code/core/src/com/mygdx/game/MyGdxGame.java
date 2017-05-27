@@ -24,6 +24,7 @@ public class MyGdxGame extends ApplicationAdapter {
         DynamicCollider chara;
         CollisionMap mp;
         ShapeRenderer shape;
+        Enemy enemy;
 	
 	@Override
 	public void create () {
@@ -82,7 +83,11 @@ public class MyGdxGame extends ApplicationAdapter {
                 mp.createCoin(12,4);
                 mp.createCoin(12,5);
                 mp.createCoin(12,6);
+                enemy = new Enemy(new Vector2(320,64),new Texture("Chinelo.png"));
+                enemy.setMap(mp);
                 chara.setMap(mp);
+                mp.addMovingObject(chara);
+                mp.addMovingObject(enemy);
 	}
 
 	@Override
@@ -93,7 +98,9 @@ public class MyGdxGame extends ApplicationAdapter {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             chara.update();
+            enemy.update();
             camera.update();
+            
             
             shape.setProjectionMatrix(camera.combined);
             
@@ -105,6 +112,7 @@ public class MyGdxGame extends ApplicationAdapter {
             batch.begin();
             mp.renderMap();
             batch.draw(droplet, (int)chara.boundingBox.x, (int)chara.boundingBox.y);
+            batch.draw(droplet, (int)enemy.boundingBox.x, (int)enemy.boundingBox.y);
             font.draw(batch,chara.getPos().toString(),100,350);
             font.draw(batch,"Coins:" + chara.coins,400,350);
             batch.end();
