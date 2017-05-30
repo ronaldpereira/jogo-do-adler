@@ -25,7 +25,6 @@ public class CollisionMap
     private static final Texture ICE = new Texture("ice.png");
     private static final Texture COIN = new Texture("Chinelo.png");
     public Tile[][] map;
-    private SpriteBatch drawArea;
     
     private int tileSize = 32;
     private int width;
@@ -33,9 +32,8 @@ public class CollisionMap
     private Quadtree movingObjects;
     private ArrayList<DynamicCollider> localObjs;
     
-    public CollisionMap(int width,int height,SpriteBatch batch)
+    public CollisionMap(int width,int height)
     {
-        drawArea = batch;
         this.width = width;
         this.height = height;
         map = new Tile[width][height];
@@ -62,9 +60,19 @@ public class CollisionMap
         map[x][y].setSprite(BLOCK);
         System.out.println("olhe " + map[x][y].getBlocks());
     }
+    
+    public int getHeight()
+    {
+        return height;
+    }
+    
+    public int getWidth()
+    {
+        return width;
+    }
     public void clearTile(int x,int y)
     {
-        map[x][y] = new Tile(x,y);
+        map[x][y] = new Tile(x*tileSize,y*tileSize);
     }
     
     public void createIce(int x,int y)
@@ -81,13 +89,13 @@ public class CollisionMap
         map[x][y] = new Coin(x * tileSize,y * tileSize,COIN);
     }
     
-    public void renderMap()
+    public void renderMap(SpriteBatch batch)
     {
         for(int i = 0;i < width;i++)
         {
             for(int j =0;j < height;j++)
             {
-                map[i][j].drawSelf(drawArea);
+                map[i][j].drawSelf(batch);
             }
         }
     }
@@ -408,6 +416,7 @@ public class CollisionMap
         {
             verticalCollision(entity,direction,distance);
         }
+        
         else
         {
             verticalCollision(entity,direction,box.getVerticalDistance(colObj.boundingBox));

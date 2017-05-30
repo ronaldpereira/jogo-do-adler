@@ -89,7 +89,7 @@ public class ControllableCharacter extends DynamicCollider
             }
         }
     }
-    
+        
     @Override
     public void handleCollision(Tile tile,CollisionInfo info)
     {
