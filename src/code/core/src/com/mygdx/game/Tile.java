@@ -11,10 +11,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  *
  * @author Hiago
  */
-public class Tile extends CollidableObject{
+public class Tile extends CollidableObject
+{
     private Texture sprite;
-    protected Boolean checksCollision;
-    private Boolean blocksMovement;
+    //protected Boolean checksCollision;
+    //private Boolean blocksMovement;
     private float attrition = 17.5f;
     private float maxSpeed = 8f;
     
@@ -38,6 +39,17 @@ public class Tile extends CollidableObject{
         attrition = value;
     }
     
+    /*
+    @Override   
+    public void setBlock(Boolean blocks)
+    {
+        if(blocks == true)
+        {
+            checksCollision = true;
+        }
+        blocksMovement = blocks;
+    }*/
+  
     public float getAttrition()
     {
         return attrition;
@@ -62,19 +74,13 @@ public class Tile extends CollidableObject{
         return sprite;
     }
     
-    public void setBlock(Boolean blocks)
-    {
-        if(blocks == true)
-        {
-            checksCollision = true;
-        }
-        blocksMovement = blocks;
-    }
-    
+    /*
+    @Override
     public Boolean getBlocks()
     {
         return blocksMovement;
     }
+    */
     
     public Boolean getCollides()
     {

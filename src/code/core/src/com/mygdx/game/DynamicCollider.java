@@ -18,6 +18,9 @@ import static java.lang.Math.signum;
  * @author Hiago
  */
 public abstract class DynamicCollider extends CollidableObject {
+    //Essa classe define todos os objetos que se movem e podem colidir
+    //com algum tipo de objeto.
+    
     protected static final float GRAVITY = 10f;
     protected static final float XACCEL = 15f;
     protected static final float REACTION = 0.05f;
@@ -33,9 +36,11 @@ public abstract class DynamicCollider extends CollidableObject {
     protected CollisionMap map;
     //TESTE
     public int coins = 0;
+    //
     
     public DynamicCollider(Vector2 initialPos,Texture sprite)
     {
+        blocksMovement = true;
         acceleration = new Vector2(0,-GRAVITY);
         maximumSpeed = new Vector2(8f,100f);
         
@@ -73,21 +78,41 @@ public abstract class DynamicCollider extends CollidableObject {
         }
     }
     
+    //Esse método, define a forma com que o objeto se move.
+    //Por exemplo, no caso do jogador, o movimento é definido pela input.    
     public abstract void updateMovement();
     
     public void update()
     {
+        //As variaveis de aceleração/velocidade são definidas no updateMovement()
         updateMovement();
+        //A aceleração é aplicada,respeitando os limites de velocidade.
         applyAcceleration();
+        //São tratadas as colisões
+        
         handleHorizontalCollision();
         handleVerticalCollision();
     }
     
+    protected void setXSpeed(float speed)
+    {
+        currentSpeed.x = speed;
+        map.closestCollisionX(this, (int)signum(currentSpeed.x),abs(currentSpeed.x));
+        map.closestCollisionY(this, (int)signum(currentSpeed.y),abs(currentSpeed.y));
+    }
+    
+    protected void setYSpeed(float speed)
+    {
+        currentSpeed.y = speed;
+        map.closestCollisionX(this, (int)signum(currentSpeed.x),abs(currentSpeed.x));
+        map.closestCollisionY(this, (int)signum(currentSpeed.y),abs(currentSpeed.y));
+    }
+//    
     private void handleHorizontalCollision()
     {
         if(currentSpeed.x != 0)
         {   
-            map.closestHorizontalCollision(this, (int)signum(currentSpeed.x),abs(currentSpeed.x));
+            map.closestCollisionX(this, (int)signum(currentSpeed.x),abs(currentSpeed.x));
         }
         boundingBox.translate(currentSpeed.x,0);
     }
@@ -96,7 +121,7 @@ public abstract class DynamicCollider extends CollidableObject {
     {
         if(currentSpeed.y != 0)
         {
-            map.closestVerticalCollision(this, (int)signum(currentSpeed.y),abs(currentSpeed.y));
+            map.closestCollisionY(this, (int)signum(currentSpeed.y),abs(currentSpeed.y));
         }
         boundingBox.translate(0,currentSpeed.y);
     }
@@ -111,5 +136,4 @@ public abstract class DynamicCollider extends CollidableObject {
     {
         obj.handleCollision(this,info);
     }
-   
 }

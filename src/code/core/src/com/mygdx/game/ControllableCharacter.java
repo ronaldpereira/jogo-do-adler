@@ -20,10 +20,9 @@ import static java.lang.Math.signum;
  */
 public class ControllableCharacter extends DynamicCollider
 {
-    
-    
     public ControllableCharacter(Vector2 initialPos, Texture sprite) {
         super(initialPos, sprite);
+        blocksMovement = false;
         //TROCAR POR SKIIIIN
         boundingBox.width -=1f;
         boundingBox.height -=1f;
@@ -69,12 +68,29 @@ public class ControllableCharacter extends DynamicCollider
         }
     }
     
+    @Override
     public void updateMovement()
     {
         handleInput();
     }
         
-            @Override
+    @Override
+    public void handleCollision(Enemy enemy,CollisionInfo info)
+    {
+        if(boundingBox.overlaps(enemy.boundingBox))
+        {
+            if(info.getAxis() == HORIZONTAL_AXIS)
+            {
+                setXSpeed(-signum(enemy.boundingBox.x - boundingBox.x) * 5);
+            }
+            else
+            {
+                setYSpeed(-signum(enemy.boundingBox.y - boundingBox.y) * 5);
+            }
+        }
+    }
+    
+    @Override
     public void handleCollision(Tile tile,CollisionInfo info)
     {
         //System.out.println("Colide com tile!!!!!!");
@@ -85,13 +101,15 @@ public class ControllableCharacter extends DynamicCollider
                 int distance = (int)boundingBox.getHorizontalDistance(tile.boundingBox);
                 currentSpeed.x = min(distance,abs(currentSpeed.x)) * signum(currentSpeed.x);
                 
-                System.out.println("Speed: "+ currentSpeed.x + "TilePosition:" + tile.boundingBox.x +"," + tile.boundingBox.y);
+                //System.out.println("Speed: "+ currentSpeed.x + "TilePosition:" + tile.boundingBox.x +"," + tile.boundingBox.y);
             }
         }
         else
         {
+            System.out.println(tile.getBlocks());
             if(tile.getBlocks())
             {
+                
                 int direction = (int)signum(currentSpeed.y);
                 int distance = (int)boundingBox.getVerticalDistance(tile.boundingBox);
                 currentSpeed.y = min(distance,abs(currentSpeed.y)) * direction;

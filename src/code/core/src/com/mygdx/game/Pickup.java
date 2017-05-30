@@ -14,6 +14,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  */
 public abstract class Pickup extends Tile
 {
+    //Essa classe define todos os objetos que podem ser pegos pelo personagem
+    //Exemplos: moedas, power ups, possivelmente itens especiais.
     private Boolean active;
     public Pickup(int x,int y,Texture spr)
     {
@@ -22,11 +24,15 @@ public abstract class Pickup extends Tile
         checksCollision = true;
     }
     
+    //O efeito é o que o objeto faz ao collidir com o player.
+    //No caso de uma moeda, o efeito seria incrementar o numero de moedas do player
     public abstract void effect(DynamicCollider player);
     
     @Override 
     public void drawSelf(SpriteBatch batch)
     {
+        //Uma instancia dessa classe só é desenhada se ela esta ativa,
+        //ou seja, se ela ainda não foi pega pelo player.
         if(active)
         {
             batch.draw(this.getSprite(),boundingBox.x,boundingBox.y);
@@ -39,7 +45,7 @@ public abstract class Pickup extends Tile
         obj.handleCollision(this,info);
     }
     
-    //@Override
+    @Override
     public void handleCollision(ControllableCharacter player,CollisionInfo info)
     {
         if(active)

@@ -8,6 +8,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import static com.mygdx.game.Axis.HORIZONTAL_AXIS;
+import static com.mygdx.game.Axis.VERTICAL_AXIS;
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
 import static java.lang.Math.signum;
@@ -49,7 +50,7 @@ public class Enemy extends DynamicCollider{
         {
             direction *= -1;
         }
-        currentSpeed.x = 2 * direction;
+        currentSpeed.x = 2f * direction;
     }
     
     @Override
@@ -60,28 +61,39 @@ public class Enemy extends DynamicCollider{
     
     @Override
     public void handleCollision(DynamicCollider player,CollisionInfo info)
-    {
+    {   
+        /*
         System.out.println("Estou colidindo com o player!");
+        int distance = (int)boundingBox.getHorizontalDistance(player.boundingBox);
+        System.out.println("distance:" + distance + "currentSpeedx: "+ currentSpeed.x);
+        currentSpeed.x = min((distance),abs(currentSpeed.x)) * signum(currentSpeed.x);
+        */
+       
     }
     
     @Override
     public void handleCollision(Tile tile,CollisionInfo info)
     {
+        
         //System.out.println("Colide com tile!!!!!!");
         if(info.getAxis() == HORIZONTAL_AXIS)
         {
+            System.out.println("Colide com tile!!!!!!");
             if(tile.getBlocks())
             {
                 int distance = (int)boundingBox.getHorizontalDistance(tile.boundingBox);
                 currentSpeed.x = min(distance,abs(currentSpeed.x)) * signum(currentSpeed.x);
                 
-                //System.out.println("Speed: "+ currentSpeed.x + "TilePosition:" + tile.boundingBox.x +"," + tile.boundingBox.y);
+                System.out.println("Enemy Speed: "+ currentSpeed.x + "TilePosition:" + tile.boundingBox.x +"," + tile.boundingBox.y);
             }
         }
-        else
+        else 
         {
+            //currentSpeed.y = 0;
+            System.out.println("Bug?");
             if(tile.getBlocks())
             {
+                System.out.println("Bug!");
                 int direction = (int)signum(currentSpeed.y);
                 int distance = (int)boundingBox.getVerticalDistance(tile.boundingBox);
                 currentSpeed.y = min(distance,abs(currentSpeed.y)) * direction;

@@ -6,6 +6,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  *
@@ -30,14 +31,26 @@ public class BoundingBox extends Rectangle{
     
     public float getHorizontalDistance(BoundingBox b)
     {
-         if(b.getLeft() >= this.getRight())
-         {
-             return b.getLeft() - this.getRight();
-         }
-         else
-         {
-             return this.getLeft() - b.getRight();
-         }
+        if(this.overlaps(b))
+        {
+            if(this.getRight() >= b.getCenter(Vector2.Zero).x)
+            {
+                return -(b.getRight() - this.getLeft());
+            }
+            else
+            {
+                return -(this.getRight() - b.getLeft());
+            }
+            //return 0;
+        }
+        if(b.getLeft() >= this.getRight())
+        {
+            return b.getLeft() - this.getRight();
+        }
+        else
+        {
+            return this.getLeft() - b.getRight();
+        }
     }
     
     public float getVerticalDistance(BoundingBox b)

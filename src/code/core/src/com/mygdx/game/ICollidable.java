@@ -16,4 +16,5 @@ public interface ICollidable
     public void handleCollision(DynamicCollider character,CollisionInfo info);
     public void collide(ICollidable obj,CollisionInfo info);
     public void handleCollision(ControllableCharacter player,CollisionInfo info);
+    public void handleCollision(Enemy enemy,CollisionInfo info);
 }

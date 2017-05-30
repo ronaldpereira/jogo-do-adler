@@ -17,6 +17,7 @@ public class MyGdxGame extends ApplicationAdapter {
     
         BitmapFont font;
         FollowerCamera camera;
+        OrthographicCamera cameraBuilder;
 	SpriteBatch batch;
 	Texture img;
         Texture droplet;
@@ -25,6 +26,9 @@ public class MyGdxGame extends ApplicationAdapter {
         CollisionMap mp;
         ShapeRenderer shape;
         Enemy enemy;
+        
+        //
+        MapBuilder mapB;
 	
 	@Override
 	public void create () {
@@ -35,6 +39,11 @@ public class MyGdxGame extends ApplicationAdapter {
                 batch = new SpriteBatch();
                 droplet = new Texture("Purp.png");
                 
+                cameraBuilder = new OrthographicCamera();
+                cameraBuilder.setToOrtho(false,800,400);
+                
+                mapB = new MapBuilder(800,400,batch,cameraBuilder);
+                /*
                 chara = new ControllableCharacter(new Vector2(300,100),droplet);
                 camera = new FollowerCamera(0f,0f,125f,150f,chara.boundingBox);
                 camera.setToOrtho(false,800,400);
@@ -70,6 +79,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 mp.createIce(24,2);
                 mp.createIce(25,2);
                 mp.createIce(26,2);
+                //mp.createBlock(20, 2);
                // mp.createBlock(18,2);
                // mp.createCoin(17,2);
                // mp.createCoin(16,2);
@@ -83,11 +93,12 @@ public class MyGdxGame extends ApplicationAdapter {
                 mp.createCoin(12,4);
                 mp.createCoin(12,5);
                 mp.createCoin(12,6);
-                enemy = new Enemy(new Vector2(320,64),new Texture("Chinelo.png"));
+                enemy = new Enemy(new Vector2(362,64),new Texture("Chinelo.png"));
                 enemy.setMap(mp);
                 chara.setMap(mp);
                 mp.addMovingObject(chara);
                 mp.addMovingObject(enemy);
+                */
 	}
 
 	@Override
@@ -97,24 +108,26 @@ public class MyGdxGame extends ApplicationAdapter {
             
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-            chara.update();
-            enemy.update();
-            camera.update();
+            //chara.update();
+            //enemy.update();
+            cameraBuilder.update();
             
+           
+            //shape.setProjectionMatrix(camera.combined);
             
-            shape.setProjectionMatrix(camera.combined);
-            
-            shape.begin(ShapeType.Line);
+            //shape.begin(ShapeType.Line);
             //shape.rect(camera.bounds.x,camera.bounds.y,camera.bounds.width,camera.bounds.height);
-            shape.end();
+            //shape.end();
+            mapB.update();
             
-            batch.setProjectionMatrix(camera.combined);
+            batch.setProjectionMatrix(cameraBuilder.combined);
             batch.begin();
-            mp.renderMap();
-            batch.draw(droplet, (int)chara.boundingBox.x, (int)chara.boundingBox.y);
-            batch.draw(droplet, (int)enemy.boundingBox.x, (int)enemy.boundingBox.y);
-            font.draw(batch,chara.getPos().toString(),100,350);
-            font.draw(batch,"Coins:" + chara.coins,400,350);
+            mapB.map.renderMap();
+            mapB.renderBuilder();
+            //batch.draw(droplet, (int)chara.boundingBox.x, (int)chara.boundingBox.y);
+            //batch.draw(enemy.sprite, (int)enemy.boundingBox.x, (int)enemy.boundingBox.y);
+            //font.draw(batch,chara.getPos().toString(),100,350);
+            //font.draw(batch,"Coins:" + chara.coins,400,350);
             batch.end();
                 
 	}
