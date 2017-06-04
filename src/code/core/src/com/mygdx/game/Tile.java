@@ -7,22 +7,25 @@ package com.mygdx.game;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.Texture; 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 /**
  *
  * @author Hiago
  */
-public class Tile extends CollidableObject
+public class Tile extends CollidableObject implements ItileDispatcher
 {
-    private Texture sprite;
     //protected Boolean checksCollision;
     //private Boolean blocksMovement;
-    private float attrition = 17.5f;
-    private float maxSpeed = 8f;
+    private float attrition = 0.075f;
+    private float maxSpeed = 8f;  
     
     public Tile(int x,int y)
     {
         //sprite = new Texture();
-        boundingBox = new BoundingBox(x,y,32,32);
+        ////TODO: mudar para a constante tileSize.
+        setBoundingBox(new BoundingBox(x,y,32,32));
         checksCollision = false;
         blocksMovement = false;
     }
@@ -30,10 +33,21 @@ public class Tile extends CollidableObject
     public Tile(int x,int y,Texture spr,Boolean blocks)
     {
         sprite = spr;
-        boundingBox = new BoundingBox(x,y,32,32);
+        setBoundingBox(new BoundingBox(x,y,32,32));
         checksCollision = blocks;
         blocksMovement = blocks;
     }
+    
+    public Tile(int x,int y,Texture spr,Boolean blocks,float attrition,float maxSpeed)
+    {
+        sprite = spr;
+        setBoundingBox(new BoundingBox(x,y,32,32));
+        checksCollision = blocks;
+        blocksMovement = blocks;
+        this.attrition = attrition;
+        this.maxSpeed = maxSpeed;
+    }
+    
     public void setAttrition(float value)
     {
         attrition = value;
@@ -41,7 +55,7 @@ public class Tile extends CollidableObject
     
     /*
     @Override   
-    public void setBlock(Boolean blocks)
+    public void setBlocks(Boolean blocks)
     {
         if(blocks == true)
         {
@@ -69,10 +83,6 @@ public class Tile extends CollidableObject
         sprite = spr;
     }
     
-    public Texture getSprite()
-    {
-        return sprite;
-    }
     
     /*
     @Override
@@ -96,15 +106,18 @@ public class Tile extends CollidableObject
     {
         if(sprite != null)
         {
-            batch.draw(sprite,boundingBox.x,boundingBox.y);
+            batch.draw(sprite,getBoundingBox().x,getBoundingBox().y);
         }
     }
     
-    public BoundingBox getPos()
+    //Deve ser overriden em todos os filhos de Tile.
+    @Override
+    public Tile createNew(Tile tile,int x,int y)
     {
-        return boundingBox;
+        return TileFactory.createTile(this, x, y);
     }
     
+    //Deve ser overriden em todos os filhos de CollidableObject
     @Override
     public void collide(ICollidable obj,CollisionInfo info)
     {   

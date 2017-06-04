@@ -16,7 +16,8 @@ public abstract class Pickup extends Tile
 {
     //Essa classe define todos os objetos que podem ser pegos pelo personagem
     //Exemplos: moedas, power ups, possivelmente itens especiais.
-    private Boolean active;
+    protected Boolean active;
+
     public Pickup(int x,int y,Texture spr)
     {
         super(x,y,spr,false);
@@ -35,7 +36,7 @@ public abstract class Pickup extends Tile
         //ou seja, se ela ainda não foi pega pelo player.
         if(active)
         {
-            batch.draw(this.getSprite(),boundingBox.x,boundingBox.y);
+            batch.draw(this.getSprite(),getBoundingBox().x,getBoundingBox().y);
         }
     }
     
@@ -50,7 +51,7 @@ public abstract class Pickup extends Tile
     {
         if(active)
         {
-            if(boundingBox.overlaps(player.boundingBox))
+            if(getBoundingBox().overlaps(player.getBoundingBox()))
             {
                 effect(player);
                 checksCollision = false;

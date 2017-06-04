@@ -71,12 +71,12 @@ public class Quadtree
        double horizontalMidpoint = bounds.getY() + (bounds.getHeight() / 2);
      
        // objeto ta nos quadrantes superiores
-       boolean topQuadrant = (thing.boundingBox.y + thing.boundingBox.height < horizontalMidpoint);////
+       boolean topQuadrant = (thing.getBoundingBox().y + thing.getBoundingBox().height < horizontalMidpoint);////
        // objeto ta nos quadrantes inferiores
-       boolean bottomQuadrant = (thing.boundingBox.y > horizontalMidpoint);
+       boolean bottomQuadrant = (thing.getBoundingBox().y > horizontalMidpoint);
      
        // objeto ta nos quadrantes da esquerda
-       if (thing.boundingBox.x < verticalMidpoint && thing.boundingBox.x + thing.boundingBox.width < verticalMidpoint) 
+       if (thing.getBoundingBox().x < verticalMidpoint && thing.getBoundingBox().x + thing.getBoundingBox().width < verticalMidpoint) 
         {
             //quadrante 2
             if (topQuadrant) 
@@ -90,7 +90,7 @@ public class Quadtree
             }
         }
         // objeto ta nos quadrantes da direita
-        else if (thing.boundingBox.x > verticalMidpoint)
+        else if (thing.getBoundingBox().x > verticalMidpoint)
         {
             //quadrante 1
             if (topQuadrant) 

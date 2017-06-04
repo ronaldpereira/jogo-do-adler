@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package com.mygdx.game;
-
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -14,7 +13,6 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
 import java.util.ArrayList;
-
 /**
  *
  * @author Hiago
@@ -53,12 +51,13 @@ public class CollisionMap
     {
         movingObjects.insert(obj);
     }
-    
-    public void createBlock(int x,int y)
+    public void createTile(int x,int y,Tile generator)
     {
-        map[x][y].setBlock(true);
-        map[x][y].setSprite(BLOCK);
-        System.out.println("olhe " + map[x][y].getBlocks());
+        if(x < 0 || x > width || y < 0 || y > height)
+        {
+            return;
+        }
+        map[x][y] = generator.createNew(generator, x*tileSize,y*tileSize);
     }
     
     public int getHeight()
@@ -72,21 +71,11 @@ public class CollisionMap
     }
     public void clearTile(int x,int y)
     {
+        if(x < 0 || x > width || y < 0 || y > height)
+        {
+            return;
+        }
         map[x][y] = new Tile(x*tileSize,y*tileSize);
-    }
-    
-    public void createIce(int x,int y)
-    {
-        map[x][y].setBlock(true);
-        map[x][y].setSprite(ICE);
-        map[x][y].setAttrition(2f);
-        map[x][y].setMaxSpeed(15f);
-        System.out.println("olhe " + map[x][y].getBlocks());
-    }
-    
-    public void createCoin(int x,int y)
-    {
-        map[x][y] = new Coin(x * tileSize,y * tileSize,COIN);
     }
     
     public void renderMap(SpriteBatch batch)
@@ -145,43 +134,56 @@ public class CollisionMap
         return false;
     }
     
+    //DETECÇÃO DE COLISÕES//
     public void closestCollisionX(DynamicCollider entity,int direction,float distance)
     {
+        //Se a direção é zero, o objeto não vai se mover nesse eixo
+        //logo, não é necessario verificar colisões*
+        //*isso só ocorre porque as colisões são sempre bilaterais,
+        //Se um outro objeto se move em direção a esse, 
+        //a colisão ainda vai ocorrer.
+        if(direction == 0)
+        {
+            return;
+        }
+        
+        //O numero de tiles que o objeto vai "deseja" andar:
         int tileDistance = (int)ceil(distance/32);
         int xPos;
-        BoundingBox box = entity.boundingBox;
+        BoundingBox box = entity.getBoundingBox();
         int delta = 0;
         Vector2 intersection = getVerticalIntersection(box);
-        
+       
         localObjs = movingObjects.getNearby(entity);
         
         float colDistance = -1;
+        //-1 aqui sinaliza apenas que o valor ainda não foi inicializado.
         CollidableObject colObj = null;
         
+        //A lista de todos os objetos dinamicos próximos a esse 
+        //é percorrida, e é encontrado o objeto primeiro objeto com o qual
+        //esse colide
         for(DynamicCollider obj : localObjs)
         {
-            //System.out.println(localObjs.size());
-            //if(entity.boundingBox.overlaps(obj.boundingBox) && entity != obj)
-            //{
-            if(checkIntersection(intersection,getVerticalIntersection(obj.boundingBox)))
+            if(checkIntersection(intersection,getVerticalIntersection(obj.getBoundingBox())))
             {
-                if(box.getHorizontalDistance(obj.boundingBox) < distance)
+                if(box.getHorizontalDistance(obj.getBoundingBox()) < distance)
                 {
                     System.out.println("eu entro aqui 1");
-                    if((obj.boundingBox.x < entity.boundingBox.x && direction < 0) ||(obj.boundingBox.x > entity.boundingBox.x && direction > 0))
+                    if((obj.getBoundingBox().x < entity.getBoundingBox().x && direction < 0) ||(obj.getBoundingBox().x > entity.getBoundingBox().x && direction > 0))
                     {
                         if(obj.getBlocks())
                         {
                             System.out.println("eu entro aqui");
                             if(colDistance == -1)
                             {
-                                colDistance = box.getHorizontalDistance(obj.boundingBox);  
+                                colDistance = box.getHorizontalDistance(obj.getBoundingBox());  
                                 colObj = obj;
                             //colDistance = box.getHorizontalDistance(obj.boundingBox)
                             }
-                            else if(box.getHorizontalDistance(obj.boundingBox) < colDistance)
+                            else if(box.getHorizontalDistance(obj.getBoundingBox()) < colDistance)
                             {
-                                colDistance = box.getHorizontalDistance(obj.boundingBox);  
+                                colDistance = box.getHorizontalDistance(obj.getBoundingBox());  
                                 colObj = obj;
                             }
                         }
@@ -192,8 +194,15 @@ public class CollisionMap
         
         if(colDistance != -1)
         {
+            //Se o valor de colDistance não é -1, uma colisão foi encontrada,
+            //Então a distancia maxima que o objeto pode andar é então ajustada.
             tileDistance = min((int)ceil(colDistance/32),tileDistance);
-        }
+        }   
+        
+        //Depois de verificar as colisões dinamicas, 
+        //são verificadas as colisões estaticas, em busca de um tile ainda mais
+        //proximo do personagem que o objeto dinamico previamente encontrado.
+           
         if(direction > 0)
         {
             xPos = (int)(findTile((int)box.getRight(),(int)box.y).x);
@@ -208,17 +217,22 @@ public class CollisionMap
 
             for(int i = (int)intersection.x; i <= (int)intersection.y; i++)
             {
+                if(i < 0 || i > width)
+                {
+                    return;
+                }
                 if(map[xPos][i].getCollides())
                 {    
                     if(map[xPos][i].getBlocks())
                     {
                         if(colObj != null)
                         {
-                            if(box.getHorizontalDistance(colObj.boundingBox) < box.getHorizontalDistance(map[xPos][i].boundingBox))
-                            {
-                                colObj = map[xPos][i];
-                                break;
-                            }
+                            //Acho que isso é desnecessário:
+                            //if(box.getHorizontalDistance(colObj.getBoundingBox()) < box.getHorizontalDistance(map[xPos][i].getBoundingBox()))
+                            //{
+                            colObj = map[xPos][i];
+                            break;
+                            //}
                         }
                         else
                         {
@@ -244,42 +258,30 @@ public class CollisionMap
         }
         else
         {
-            horizontalCollision(entity,direction,box.getHorizontalDistance(colObj.boundingBox));
+            horizontalCollision(entity,direction,box.getHorizontalDistance(colObj.getBoundingBox()));
         }
     }
     
     private void horizontalCollision(DynamicCollider entity,int direction,float distance)
     {
         
-        if(direction == 0)
-        {
-            return;
-        }
         //movingObjects.clear();
         int tileDistance = (int)ceil(distance/32);
         int xPos;
-        BoundingBox box = entity.boundingBox;
+        BoundingBox box = entity.getBoundingBox();
         int delta = 0;
         Vector2 intersection = getVerticalIntersection(box);
-        //System.out.println("Inter :" + intersection.toString());
-        
-
-                //if(localObjs)
-                //if
-            //}
+ 
         localObjs = movingObjects.getNearby(entity);
         
         for(DynamicCollider obj : localObjs)
         {
-            //System.out.println(localObjs.size());
-            //if(entity.boundingBox.overlaps(obj.boundingBox) && entity != obj)
-            //{
-            if(checkIntersection(intersection,getVerticalIntersection(obj.boundingBox)))
+            if(checkIntersection(intersection,getVerticalIntersection(obj.getBoundingBox())))
             {
-                if(box.getHorizontalDistance(obj.boundingBox) <= distance)
+                if(box.getHorizontalDistance(obj.getBoundingBox()) <= distance)
                 {
                     System.out.println("eu entro aqui 1");
-                    if((obj.boundingBox.x < entity.boundingBox.x && direction < 0) ||(obj.boundingBox.x > entity.boundingBox.x && direction > 0))
+                    if((obj.getBoundingBox().x < entity.getBoundingBox().x && direction < 0) ||(obj.getBoundingBox().x > entity.getBoundingBox().x && direction > 0))
                     {     
                         entity.collide(obj,new CollisionInfo(entity,HORIZONTAL_AXIS));
                         obj.collide(entity,new CollisionInfo(obj,HORIZONTAL_AXIS));
@@ -323,7 +325,7 @@ public class CollisionMap
     {
         int tileDistance = (int)ceil(distance/32);
         int yPos;
-        BoundingBox box = entity.boundingBox;
+        BoundingBox box = entity.getBoundingBox();
         int delta = 0;
         Vector2 intersection = getHorizontalIntersection(box);
         
@@ -337,25 +339,25 @@ public class CollisionMap
             //System.out.println(localObjs.size());
             //if(entity.boundingBox.overlaps(obj.boundingBox) && entity != obj)
             //{
-            if(checkIntersection(intersection,getHorizontalIntersection(obj.boundingBox)))
+            if(checkIntersection(intersection,getHorizontalIntersection(obj.getBoundingBox())))
             {
-                if(box.getVerticalDistance(obj.boundingBox) <= distance)
+                if(box.getVerticalDistance(obj.getBoundingBox()) <= distance)
                 {
                     System.out.println("eu entro aqui 1");
-                    if((obj.boundingBox.y < entity.boundingBox.y && direction < 0) ||(obj.boundingBox.y > entity.boundingBox.y && direction > 0))
+                    if((obj.getBoundingBox().y < entity.getBoundingBox().y && direction < 0) ||(obj.getBoundingBox().y > entity.getBoundingBox().y && direction > 0))
                     {
                         if(obj.getBlocks())
                         {
                             System.out.println("eu entro aqui");
                             if(colDistance == -1)
                             {
-                                colDistance = box.getVerticalDistance(obj.boundingBox);  
+                                colDistance = box.getVerticalDistance(obj.getBoundingBox());  
                                 colObj = obj;
                             //colDistance = box.getHorizontalDistance(obj.boundingBox)
                             }
-                            else if(box.getVerticalDistance(obj.boundingBox) < colDistance)
+                            else if(box.getVerticalDistance(obj.getBoundingBox()) < colDistance)
                             {
-                                colDistance = box.getVerticalDistance(obj.boundingBox);  
+                                colDistance = box.getVerticalDistance(obj.getBoundingBox());  
                                 colObj = obj;
                             }
                         }
@@ -382,13 +384,18 @@ public class CollisionMap
 
             for(int i = (int)intersection.x; i <= (int)intersection.y; i++)
             {
+                if(i < 0 || i > height)
+                {
+                    return;
+                }
+                
                 if(map[i][yPos].getCollides())
                 {    
                     if(map[i][yPos].getBlocks())
                     {
                         if(colObj != null)
                         {
-                            if(box.getVerticalDistance(colObj.boundingBox) < box.getVerticalDistance(map[i][yPos].boundingBox))
+                            if(box.getVerticalDistance(colObj.getBoundingBox()) < box.getVerticalDistance(map[i][yPos].getBoundingBox()))
                             {
                                 colObj = map[i][yPos];
                                 break;
@@ -419,7 +426,7 @@ public class CollisionMap
         
         else
         {
-            verticalCollision(entity,direction,box.getVerticalDistance(colObj.boundingBox));
+            verticalCollision(entity,direction,box.getVerticalDistance(colObj.getBoundingBox()));
         }
     }
     
@@ -432,7 +439,7 @@ public class CollisionMap
         //movingObjects.clear();
         int tileDistance = (int)ceil(distance/32);
         int yPos;
-        BoundingBox box = entity.boundingBox;
+        BoundingBox box = entity.getBoundingBox();
         int delta = 0;
         Vector2 intersection = getHorizontalIntersection(box);
         //System.out.println("Inter :" + intersection.toString());
@@ -448,12 +455,12 @@ public class CollisionMap
             //System.out.println(localObjs.size());
             //if(entity.boundingBox.overlaps(obj.boundingBox) && entity != obj)
             //{
-            if(checkIntersection(intersection,getHorizontalIntersection(obj.boundingBox)))
+            if(checkIntersection(intersection,getHorizontalIntersection(obj.getBoundingBox())))
             {
-                if(box.getVerticalDistance(obj.boundingBox) <= distance)
+                if(box.getVerticalDistance(obj.getBoundingBox()) <= distance)
                 {
                     System.out.println("eu entro aqui 1");
-                    if((obj.boundingBox.y < entity.boundingBox.y && direction < 0) ||(obj.boundingBox.y > entity.boundingBox.y && direction > 0))
+                    if((obj.getBoundingBox().y < entity.getBoundingBox().y && direction < 0) ||(obj.getBoundingBox().y > entity.getBoundingBox().y && direction > 0))
                     {     
                         entity.collide(obj,new CollisionInfo(entity,VERTICAL_AXIS));
                         obj.collide(entity,new CollisionInfo(obj,VERTICAL_AXIS));

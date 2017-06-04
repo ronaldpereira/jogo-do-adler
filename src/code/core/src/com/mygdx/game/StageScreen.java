@@ -28,7 +28,7 @@ public class StageScreen extends ScreenAdapter
         this.player = player;
         this.map = map;
         batch = new SpriteBatch();
-        camera = new FollowerCamera(0,0,150,150,player.boundingBox);
+        camera = new FollowerCamera(map,0,0,125,75, player.getBoundingBox());
         camera.setToOrtho(false,800,400);
     }
     
@@ -42,7 +42,7 @@ public class StageScreen extends ScreenAdapter
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         map.renderMap(batch);
-        batch.draw(new Texture("Chinelo.png"), (int)player.boundingBox.x, (int)player.boundingBox.y);
+        batch.draw(new Texture("Purp.png"), (int)player.getBoundingBox().x, (int)player.getBoundingBox().y);
         //batch.draw(enemy.sprite, (int)enemy.boundingBox.x, (int)enemy.boundingBox.y);
         //font.draw(batch,chara.getPos().toString(),100,350);
         //font.draw(batch,"Coins:" + chara.coins,400,350);

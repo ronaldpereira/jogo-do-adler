@@ -23,15 +23,14 @@ public abstract class DynamicCollider extends CollidableObject {
     
     protected static final float GRAVITY = 10f;
     protected static final float XACCEL = 15f;
-    protected static final float REACTION = 0.05f;
+    protected static final float REACTION = 0.075f;
     
     protected final Vector2 maximumSpeed;
     
-    protected float attrition = 17.5f;
+    protected float attrition = 0.05f;
     protected Boolean grounded = false;
     protected Vector2 currentSpeed;
     protected Vector2 acceleration;
-    protected Texture sprite;
     
     protected CollisionMap map;
     //TESTE
@@ -46,7 +45,7 @@ public abstract class DynamicCollider extends CollidableObject {
         
         currentSpeed = new Vector2(0,0);
         
-        this.boundingBox = new BoundingBox(initialPos.x,initialPos.y,sprite.getWidth(),sprite.getHeight());
+        setBoundingBox(new BoundingBox(initialPos.x,initialPos.y,sprite.getWidth(),sprite.getHeight()));
         this.sprite = sprite;
     }
     public void setMap(CollisionMap map)
@@ -58,7 +57,9 @@ public abstract class DynamicCollider extends CollidableObject {
         //Aplica atrito:
         if(acceleration.x == 0)
         {
-            currentSpeed.x = currentSpeed.x - (signum(currentSpeed.x) * attrition) * Gdx.graphics.getDeltaTime();
+            //Cade frame, o objeto perde uma porcentagem da velocidade, indicada
+            //pela variavel atrito.
+            currentSpeed.x -= (currentSpeed.x) * attrition;
             if(abs(currentSpeed.x) < 1f)
             {
                 currentSpeed.x = 0;
@@ -84,7 +85,8 @@ public abstract class DynamicCollider extends CollidableObject {
     
     public void update()
     {
-        //As variaveis de aceleração/velocidade são definidas no updateMovement()
+        //A mudança das variaveis de aceleração/velocidade 
+        //são definidas no updateMovement()
         updateMovement();
         //A aceleração é aplicada,respeitando os limites de velocidade.
         applyAcceleration();
@@ -96,16 +98,24 @@ public abstract class DynamicCollider extends CollidableObject {
     
     protected void setXSpeed(float speed)
     {
+        //Quando a velocidade é mudada fora do metodo updateMovement,
+        //As colisões devem ser checadas novamente.
         currentSpeed.x = speed;
-        map.closestCollisionX(this, (int)signum(currentSpeed.x),abs(currentSpeed.x));
-        map.closestCollisionY(this, (int)signum(currentSpeed.y),abs(currentSpeed.y));
+        if(speed != 0)
+        {
+            map.closestCollisionX(this, (int)signum(currentSpeed.x),abs(currentSpeed.x));
+            map.closestCollisionY(this, (int)signum(currentSpeed.y),abs(currentSpeed.y));
+        }
     }
     
     protected void setYSpeed(float speed)
     {
         currentSpeed.y = speed;
-        map.closestCollisionX(this, (int)signum(currentSpeed.x),abs(currentSpeed.x));
-        map.closestCollisionY(this, (int)signum(currentSpeed.y),abs(currentSpeed.y));
+        if(speed != 0)
+        {
+            map.closestCollisionX(this, (int)signum(currentSpeed.x),abs(currentSpeed.x));
+            map.closestCollisionY(this, (int)signum(currentSpeed.y),abs(currentSpeed.y));
+        }
     }
 //    
     private void handleHorizontalCollision()
@@ -114,7 +124,7 @@ public abstract class DynamicCollider extends CollidableObject {
         {   
             map.closestCollisionX(this, (int)signum(currentSpeed.x),abs(currentSpeed.x));
         }
-        boundingBox.translate(currentSpeed.x,0);
+        getBoundingBox().translate(currentSpeed.x,0);
     }
 
     private void handleVerticalCollision()
@@ -123,13 +133,9 @@ public abstract class DynamicCollider extends CollidableObject {
         {
             map.closestCollisionY(this, (int)signum(currentSpeed.y),abs(currentSpeed.y));
         }
-        boundingBox.translate(0,currentSpeed.y);
+        getBoundingBox().translate(0,currentSpeed.y);
     }
     
-    public BoundingBox getPos()
-    {
-        return boundingBox;
-    }
     
     @Override
     public void collide(ICollidable obj,CollisionInfo info)

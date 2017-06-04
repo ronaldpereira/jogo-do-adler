@@ -17,4 +17,5 @@ public interface ICollidable
     public void collide(ICollidable obj,CollisionInfo info);
     public void handleCollision(ControllableCharacter player,CollisionInfo info);
     public void handleCollision(Enemy enemy,CollisionInfo info);
+    public void handleCollision(Repulsor repulsor,CollisionInfo info);
 }

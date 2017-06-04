@@ -18,7 +18,7 @@ import static java.lang.Math.signum;
  * @author Hiago
  */
 public class Enemy extends DynamicCollider{
-    
+    ////TODO:MUDA TUDO
     //CHANGE:
     float xOrigin;
     int direction = 1;
@@ -28,11 +28,11 @@ public class Enemy extends DynamicCollider{
         if(direction < 0)
         {
             //REMOVER ISSO E TROCAR POR SKIN
-            xOrigin = boundingBox.getRight() - 1;
+            xOrigin = getBoundingBox().getRight() - 1;
         }
         else
         {
-            xOrigin = boundingBox.getLeft() + 1;
+            xOrigin = getBoundingBox().getLeft() + 1;
         }
     }
     public Enemy(Vector2 initialPos, Texture sprite) {
@@ -45,8 +45,8 @@ public class Enemy extends DynamicCollider{
         setOrigin();
         //System.out.println("Estou com essa velocidade: " + currentSpeed.x +" essa direcao " + direction + " e essa origem:" + xOrigin);
         //System.out.println("To nesse tile " +((int)map.findTile(xOrigin,boundingBox.y).x + direction) + " y =" + (int)map.findTile(xOrigin,boundingBox.y).y);
-        if(!map.getTile((int)map.findTile(xOrigin,boundingBox.y).x + direction,(int)map.findTile(xOrigin,boundingBox.y).y - 1).getBlocks()
-           || map.getTile((int)map.findTile(xOrigin,boundingBox.y).x + direction,(int)map.findTile(xOrigin,boundingBox.y).y).getBlocks())
+        if(!map.getTile((int)map.findTile(xOrigin,getBoundingBox().y).x + direction,(int)map.findTile(xOrigin,getBoundingBox().y).y - 1).getBlocks()
+           || map.getTile((int)map.findTile(xOrigin,getBoundingBox().y).x + direction,(int)map.findTile(xOrigin,getBoundingBox().y).y).getBlocks())
         {
             direction *= -1;
         }
@@ -81,10 +81,10 @@ public class Enemy extends DynamicCollider{
             System.out.println("Colide com tile!!!!!!");
             if(tile.getBlocks())
             {
-                int distance = (int)boundingBox.getHorizontalDistance(tile.boundingBox);
+                int distance = (int)getBoundingBox().getHorizontalDistance(tile.getBoundingBox());
                 currentSpeed.x = min(distance,abs(currentSpeed.x)) * signum(currentSpeed.x);
                 
-                System.out.println("Enemy Speed: "+ currentSpeed.x + "TilePosition:" + tile.boundingBox.x +"," + tile.boundingBox.y);
+                System.out.println("Enemy Speed: "+ currentSpeed.x + "TilePosition:" + tile.getBoundingBox().x +"," + tile.getBoundingBox().y);
             }
         }
         else 
@@ -95,7 +95,7 @@ public class Enemy extends DynamicCollider{
             {
                 System.out.println("Bug!");
                 int direction = (int)signum(currentSpeed.y);
-                int distance = (int)boundingBox.getVerticalDistance(tile.boundingBox);
+                int distance = (int)getBoundingBox().getVerticalDistance(tile.getBoundingBox());
                 currentSpeed.y = min(distance,abs(currentSpeed.y)) * direction;
 
                 if(direction < 0 && distance == 0)

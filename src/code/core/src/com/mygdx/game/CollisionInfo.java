@@ -4,14 +4,13 @@
  * and open the template in the editor.
  */
 package com.mygdx.game;
-
 /**
  *
  * @author Hiago
  */
-
 public class CollisionInfo
 {
+    //Guarda informações sobre a colisão.
     private final ICollidable collisionObject;
     private final Axis axis;
 
