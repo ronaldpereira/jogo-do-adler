@@ -5,6 +5,10 @@
  */
 package com.mygdx.game;
 
+import com.mygdx.game.Tiles.AbstractTile;
+import com.mygdx.game.Tiles.Tile;
+import com.mygdx.game.Tiles.Repulsor;
+
 /**
  *
  * @author Hiago
@@ -12,6 +16,7 @@ package com.mygdx.game;
 public interface ICollidable
 {
     public void handleCollision(ICollidable obj,CollisionInfo info);
+    public void handleCollision(AbstractTile tile,CollisionInfo info);
     public void handleCollision(Tile tile,CollisionInfo info);
     public void handleCollision(DynamicCollider character,CollisionInfo info);
     public void collide(ICollidable obj,CollisionInfo info);

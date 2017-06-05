@@ -5,7 +5,13 @@
  */
 package com.mygdx.game;
 
+import com.mygdx.game.Tiles.Tile;
+import com.mygdx.game.Tiles.Repulsor;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.mygdx.game.Tiles.AbstractTile;
 /**
  *
  * @author Hiago
@@ -18,11 +24,26 @@ public abstract class CollidableObject implements ICollidable
     //de substituição de liskov.
     protected Boolean checksCollision = true;
     protected Boolean blocksMovement = false;
-    protected Texture sprite;
+    
+    protected Texture texture;
+    protected Sprite sprite;
+    
+    protected Animation<TextureRegion> animation;
     private BoundingBox boundingBox;
     
-    public Texture getSprite()
+    public CollidableObject(int x,int y,Texture texture)
     {
+        setBoundingBox(new BoundingBox(x,y,CollisionMap.tileSize,CollisionMap.tileSize));
+        this.texture = texture;
+    }
+    
+    public void animationFromTexture()
+    {
+        
+    }
+    public Sprite getSprite()
+    {
+        sprite = new Sprite(texture);
         return sprite;
     }
     public Boolean getBlocks()
@@ -43,9 +64,15 @@ public abstract class CollidableObject implements ICollidable
     public void handleCollision(ICollidable obj,CollisionInfo info){}
     
     @Override
-    public void handleCollision(Tile tile,CollisionInfo info)
+    public void handleCollision(AbstractTile tile,CollisionInfo info)
     {
         handleCollision((CollidableObject) tile,info);
+    } 
+    
+    @Override
+    public void handleCollision(Tile tile,CollisionInfo info)
+    {
+        handleCollision((AbstractTile) tile,info);
     }      
     
     @Override
@@ -62,7 +89,7 @@ public abstract class CollidableObject implements ICollidable
     @Override
     public void handleCollision(Repulsor repulsor,CollisionInfo info)
     {
-        handleCollision((Tile)repulsor,info);
+        handleCollision((AbstractTile)repulsor,info);
     }
     @Override
     public void handleCollision(Enemy enemy, CollisionInfo info)

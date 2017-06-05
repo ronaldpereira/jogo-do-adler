@@ -9,7 +9,7 @@ package com.mygdx.game;
  *
  * @author Hiago
  */
-public interface ItileDispatcher 
+public class CharacterAnimation 
 {
-    public Tile createNew(Tile tile,int x,int y);
+
 }

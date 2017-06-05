@@ -5,12 +5,15 @@
  */
 package com.mygdx.game;
 
+import com.mygdx.game.Tiles.Tile;
+import com.mygdx.game.Tiles.Repulsor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import static com.mygdx.game.Axis.HORIZONTAL_AXIS;
 import static com.mygdx.game.Axis.VERTICAL_AXIS;
+import com.mygdx.game.Tiles.AbstractTile;
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
 import static java.lang.Math.signum;
@@ -106,7 +109,7 @@ public class ControllableCharacter extends DynamicCollider
     }
         
     @Override
-    public void handleCollision(Tile tile,CollisionInfo info)
+    public void handleCollision(AbstractTile tile,CollisionInfo info)
     {
         //A velocidade final após a colisão com um determinado tile
         //é o mínimo entre a velocidade do jogador e a distancia com o tile
@@ -133,8 +136,21 @@ public class ControllableCharacter extends DynamicCollider
                     //Nesse caso, o jogador está no chão e pode pular.
                     grounded = true;
                 }
-
-                if(grounded == true)
+            }
+            
+        }
+    }
+    
+    @Override
+    public void handleCollision(Tile tile,CollisionInfo info)
+    {
+        //O atrito, e a velocidade variam com o tile que
+        //o personagem está.
+        ////TODO:Colocar a altura de pulo aqui também;
+        handleCollision((AbstractTile)tile,info);
+        if(info.getAxis() == VERTICAL_AXIS && tile.getBlocks())
+        {
+            if(grounded == true)
                 {
                     //O atrito, e a velocidade variam com o tile que
                     //o personagem está.
@@ -142,8 +158,6 @@ public class ControllableCharacter extends DynamicCollider
                     attrition = tile.getAttrition();
                     maximumSpeed.x = tile.getMaxSpeed();
                 }
-            }
-            
         }
     }
     
@@ -175,14 +189,14 @@ public class ControllableCharacter extends DynamicCollider
             }   
             else if(!getBoundingBox().overlaps(repulsor.getBoundingBox()))
             {
-                handleCollision((Tile)repulsor,info);
+                handleCollision((AbstractTile)repulsor,info);
             }
         }
         else
         {
             if(!getBoundingBox().overlaps(repulsor.getBoundingBox()))
             {
-                handleCollision((Tile)repulsor,info);
+                handleCollision((AbstractTile)repulsor,info);
             }
         }
     }

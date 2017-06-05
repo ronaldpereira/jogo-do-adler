@@ -5,6 +5,9 @@
  */
 package com.mygdx.game;
 
+import com.mygdx.game.Tiles.Coin;
+import com.mygdx.game.Tiles.Tile;
+import com.mygdx.game.Tiles.Repulsor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
@@ -30,6 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 import static com.mygdx.game.Axis.HORIZONTAL_AXIS;
 import static com.mygdx.game.Axis.VERTICAL_AXIS;
+import com.mygdx.game.Tiles.AbstractTile;
 import java.util.ArrayList;
 import javafx.scene.Scene;
 
@@ -50,8 +54,8 @@ public class MapBuilder implements Disposable
     //
     InputMultiplexer multiplexer;
     CollisionMap map;
-    ArrayList<Tile> possibleTiles;
-    Tile selectedTile;
+    ArrayList<AbstractTile> possibleTiles;
+    AbstractTile selectedTile;
     Vector2 currentTile;
     Texture picker;
     FollowerCamera camera;
@@ -72,7 +76,7 @@ public class MapBuilder implements Disposable
     
     public MapBuilder(CollisionMap map, SpriteBatch batch, final FollowerCamera camera,Stage stage)
     {
-        possibleTiles = new ArrayList<Tile>();
+        possibleTiles = new ArrayList<AbstractTile>();
         ////TODO: POSSIBILITAR A CRIAÇÃO DE NOVOS TILES ATRAVES DE UM TILE GERADOR
         possibleTiles.add(new Tile(0,0,new Texture("BlackBlock.png"),true));
         possibleTiles.add(new Tile(0,0,new Texture("Ice.png"),true,0.01f,12f));
@@ -122,7 +126,7 @@ public class MapBuilder implements Disposable
         
         uiProcessor = stage;
         
-        for(Tile tile : possibleTiles)
+        for(AbstractTile tile : possibleTiles)
         {
             tileButtons.add(new ImageButton(new TextureRegionDrawable(new TextureRegion(tile.getSprite()))));
         }

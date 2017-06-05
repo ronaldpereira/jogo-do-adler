@@ -3,16 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mygdx.game;
+package com.mygdx.game.Tiles;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.Axis;
+import com.mygdx.game.CollisionInfo;
+import com.mygdx.game.ICollidable;
 
 /**
  *
  * @author Hiago
  */
-public class Repulsor extends Tile
+public class Repulsor extends AbstractTile
 {
     //Essa classe define tiles que "empurram" 
     //o jogador, ou possivelmente outros DynamicColliders
@@ -48,7 +51,7 @@ public class Repulsor extends Tile
     }
     
     @Override
-    public Repulsor createNew(Tile tile,int x,int y)
+    public Repulsor createNew(AbstractTile tile,int x,int y)
     {
         return TileFactory.createTile(this, x, y);
     }

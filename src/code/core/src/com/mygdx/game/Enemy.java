@@ -5,6 +5,7 @@
  */
 package com.mygdx.game;
 
+import com.mygdx.game.Tiles.Tile;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import static com.mygdx.game.Axis.HORIZONTAL_AXIS;

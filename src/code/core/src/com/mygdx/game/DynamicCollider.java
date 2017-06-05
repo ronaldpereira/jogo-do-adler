@@ -39,15 +39,13 @@ public abstract class DynamicCollider extends CollidableObject {
     
     public DynamicCollider(Vector2 initialPos,Texture sprite)
     {
+        super((int)initialPos.x,(int)initialPos.y,sprite);
         blocksMovement = true;
         acceleration = new Vector2(0,-GRAVITY);
         maximumSpeed = new Vector2(8f,100f);
-        
         currentSpeed = new Vector2(0,0);
-        
-        setBoundingBox(new BoundingBox(initialPos.x,initialPos.y,sprite.getWidth(),sprite.getHeight()));
-        this.sprite = sprite;
     }
+    
     public void setMap(CollisionMap map)
     {
         this.map = map;

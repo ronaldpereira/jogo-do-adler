@@ -4,11 +4,14 @@
  * and open the template in the editor.
  */
 package com.mygdx.game;
+import com.mygdx.game.Tiles.Tile;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import static com.mygdx.game.Axis.*;
+import com.mygdx.game.Tiles.AbstractTile;
+import com.mygdx.game.Tiles.TileFactory;
 import static java.lang.Math.ceil;
 import static java.lang.Math.floor;
 import static java.lang.Math.min;
@@ -22,9 +25,9 @@ public class CollisionMap
     private static final Texture BLOCK = new Texture("BlackBlock.png");
     private static final Texture ICE = new Texture("ice.png");
     private static final Texture COIN = new Texture("Chinelo.png");
-    public Tile[][] map;
+    public AbstractTile[][] map;
     
-    private int tileSize = 32;
+    public static final int tileSize = 32;
     private int width;
     private int height;
     private Quadtree movingObjects;
@@ -34,7 +37,7 @@ public class CollisionMap
     {
         this.width = width;
         this.height = height;
-        map = new Tile[width][height];
+        map = new AbstractTile[width][height];
         
         //QUADTREE
         movingObjects = new Quadtree(0,new Rectangle(0,0,width * tileSize,height * tileSize)); 
@@ -43,7 +46,7 @@ public class CollisionMap
         {
             for(int j = 0;j < height;j++)
             {
-                map[i][j] = new Tile(i * tileSize,j * tileSize);
+                map[i][j] = TileFactory.createEmpty(i, j);
             }
         }
     }
@@ -51,7 +54,10 @@ public class CollisionMap
     {
         movingObjects.insert(obj);
     }
-    public void createTile(int x,int y,Tile generator)
+    
+    //Cria um tile na posição [x][y] usando como guia um certo "gerador"
+    //Na prática, o objeto criado será uma copia do gerador mas com posição diferente
+    public void createTile(int x,int y,AbstractTile generator)
     {
         if(x < 0 || x > width || y < 0 || y > height)
         {
@@ -75,7 +81,7 @@ public class CollisionMap
         {
             return;
         }
-        map[x][y] = new Tile(x*tileSize,y*tileSize);
+        map[x][y] = TileFactory.createEmpty(x*tileSize,y*tileSize);
     }
     
     public void renderMap(SpriteBatch batch)
@@ -89,12 +95,14 @@ public class CollisionMap
         }
     }
     
+    //Retorna uma dada posição para uma posição no mapa(um tile).
     public Vector2 findTile(float x,float y)
     {       
         return new Vector2((int)x/tileSize,(int)y/tileSize);
     }
     
-    public Tile getTile(int x,int y)
+    //Retorna o tile na posição [x][y].
+    public AbstractTile getTile(int x,int y)
     {
         return map[x][y];
     }
@@ -108,7 +116,7 @@ public class CollisionMap
     {
         int min = (int)(findTile(boundingBox.x,boundingBox.y).x);
         int max = (int)(findTile((boundingBox.x + boundingBox.width),boundingBox.y).x);
-       // System.out.println("HORIZONTAL: " + min + " - " + max);
+
         return new Vector2(min,max);
     }
     
@@ -116,7 +124,6 @@ public class CollisionMap
     {
         int min = (int)(findTile(boundingBox.x,boundingBox.y).y);
         int max = (int)(findTile(boundingBox.x,(boundingBox.y + boundingBox.height)).y);
-        //System.out.println("VERTICAL: " + min + " - " + max)F;
         
         return new Vector2(min,max);
     }
@@ -147,7 +154,7 @@ public class CollisionMap
             return;
         }
         
-        //O numero de tiles que o objeto vai "deseja" andar:
+        //O numero de tiles que o objeto "deseja" andar:
         int tileDistance = (int)ceil(distance/32);
         int xPos;
         BoundingBox box = entity.getBoundingBox();
@@ -188,7 +195,7 @@ public class CollisionMap
                             }
                         }
                     }//colObj = obj;
-                }
+                }  
             }    
         }
         

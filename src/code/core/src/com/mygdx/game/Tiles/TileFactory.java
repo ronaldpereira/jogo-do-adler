@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mygdx.game;
+package com.mygdx.game.Tiles;
 
 /**
  *
@@ -11,23 +11,28 @@ package com.mygdx.game;
  */
 public class TileFactory 
 {
+    public static EmptyTile createEmpty(int x,int y)
+    {
+        return new EmptyTile(x,y);
+    }
+    
     public static Tile createTile(Tile tile, int x,int y)
     {   
         System.out.println(tile.getClass());
-        Tile clone = new Tile(x,y,tile.getSprite(),tile.getBlocks(),
+        Tile clone = new Tile(x,y,tile.getSprite().getTexture(),tile.getBlocks(),
                                 tile.getAttrition(),tile.getMaxSpeed());
         return clone;
     }
     
     public static Coin createTile(Coin coin, int x,int y)
     {
-        Coin clone = new Coin(x,y,coin.getSprite());
+        Coin clone = new Coin(x,y,coin.getSprite().getTexture());
         return clone;
     }
     
     public static Repulsor createTile(Repulsor repulsor, int x,int y)
     {
-        Repulsor clone = new Repulsor(x,y,repulsor.getSprite(),repulsor.getAxis(),
+        Repulsor clone = new Repulsor(x,y,repulsor.getSprite().getTexture(),repulsor.getAxis(),
                 repulsor.getDirection(),repulsor.getRepulsionSpeed());
         return clone;
     }
