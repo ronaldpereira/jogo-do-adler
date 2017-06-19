@@ -1,19 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.mygdx.game;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-/**
- *
- * @author Hiago
- */
-public class BoundingBox extends Rectangle{
-    //TODO:ADICIONAR SKIN
+public class BoundingBox extends Rectangle
+{   
+    //Essa classe representa o boundingBox de um personagem,
+    //ou seja, um retangulo que delimita seu espaço no mundo.
+    
+    //Construtor vazio para serialização.
+    private BoundingBox()
+    {
+        super();
+    }
+    
     public BoundingBox(float x,float y,float width,float height)
     {
        super();
@@ -22,15 +23,34 @@ public class BoundingBox extends Rectangle{
        this.width = width;
        this.height = height;
     }
+    
+    public BoundingBox(BoundingBox box)
+    {
+       //Copy constructor.
+       super();
+       this.x = box.x;
+       this.y = box.y;
+       this.width = box.width;
+       this.height = box.height;
+    }
    
+    public void setPositionRelative(BoundingBox origin)
+    {
+        //Seta a posição dessa boundingBox em relação à uma outra.
+        this.x += origin.x;
+        this.y += origin.y;
+    }
     public void translate(float xDir,float yDir)
     { 
+        //Aplica uma translação de (xDir,yDir) no objeto.
         x += xDir;
         y += yDir;
     }
     
+    //Econtra a distancia entre as extremidadades de duas boundingBoxes.
     public float getHorizontalDistance(BoundingBox b)
     {
+        //Quando um objeto está em interceção com outro,a a distancia é negativa:
         if(this.overlaps(b))
         {
             if(this.getRight() >= b.getCenter(Vector2.Zero).x)
@@ -41,7 +61,6 @@ public class BoundingBox extends Rectangle{
             {
                 return -(this.getRight() - b.getLeft());
             }
-            //return 0;
         }
         if(b.getLeft() >= this.getRight())
         {
@@ -52,9 +71,23 @@ public class BoundingBox extends Rectangle{
             return this.getLeft() - b.getRight();
         }
     }
-    
+   
+    //Econtra a distancia entre as extremidadades de duas boundingBoxes.   
     public float getVerticalDistance(BoundingBox b)
     {
+        //Quando um objeto está em interceção com outro,a a distancia é negativa:
+        if(this.overlaps(b))
+        {
+            if(this.getDown() > b.getCenter(Vector2.Zero).y)
+            {
+                return -(b.getUp() - this.getDown());
+            }
+            else
+            {
+                return -(this.getUp() - b.getDown());
+            }
+        }
+        
         if(b.getDown() >= this.getUp())
         {
             return b.getDown() - this.getUp();

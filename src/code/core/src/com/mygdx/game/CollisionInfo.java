@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package com.mygdx.game;
+
+import com.mygdx.game.collidable.ICollidable;
+
 /**
  *
  * @author Hiago
@@ -16,7 +19,7 @@ public class CollisionInfo
 
     public CollisionInfo(ICollidable obj, Axis axis)
     {
-        this.collisionObject = obj;
+        collisionObject = obj;
         this.axis = axis;
     }
 
