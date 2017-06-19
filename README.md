@@ -1,3 +1,3 @@
-# NOME LIXO DO PROJETO, FAVOR MUDAR PARA UM NOME BEM MELHOR, ATT: ADLER MELGAÇO
+# Projeto Final de Programação Modular
 
-## Jogo do Adler usando a linguagem Java e interface gráfica
+## Jogo do Adler usando a linguagem Java, libgdx e interface gráfica
